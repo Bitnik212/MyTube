@@ -29,17 +29,20 @@ describe("buildOpenApiDocument", () => {
 
     expect(document.openapi).toBe("3.0.3");
     expect(document.paths["/api/videos"]?.get).toMatchObject({
-      summary: "GET Videos",
+      operationId: "getVideos",
+      summary: "List videos",
       tags: ["videos"],
     });
     expect(document.paths["/api/settings/password-enabled"]?.get).toMatchObject({
-      summary: "GET Settings Password Enabled",
-      tags: ["settings"],
+      summary: "Check password login status",
+      tags: ["auth"],
     });
     expect(document.paths["/feed/{token}"]?.get).toMatchObject({
-      summary: "GET Feed Token",
+      summary: "Get RSS feed",
       tags: ["feed"],
     });
+    expect(document.components.schemas.Video).toBeDefined();
+    expect(document.components.schemas.DownloadRequest).toBeDefined();
   });
 
   it("converts Express path parameters and documents API key security", () => {
@@ -59,13 +62,22 @@ describe("buildOpenApiDocument", () => {
       { apiKeyHeader: [] },
       { apiKeyAuthorization: [] },
     ]);
+    expect(operation?.responses["200"].content?.["application/json"]).toEqual({
+      schema: { $ref: "#/components/schemas/Video" },
+    });
   });
 
-  it("documents CSRF header security for cookie-authenticated writes", () => {
+  it("documents request DTOs, CSRF security, and curl samples for writes", () => {
     const document = buildOpenApiDocument();
+    const operation = document.paths["/api/videos/{id}"]?.put;
 
-    expect(document.paths["/api/videos/{id}"]?.put?.security).toEqual([
+    expect(operation?.security).toEqual([
       { cookieAuth: [], csrfHeader: [] },
     ]);
+    expect(operation?.requestBody?.content["application/json"]).toEqual({
+      schema: { $ref: "#/components/schemas/UpdateVideoRequest" },
+    });
+    expect(operation?.["x-codeSamples"]?.[0].source).toContain("curl -X PUT");
+    expect(operation?.["x-codeSamples"]?.[0].source).toContain("X-CSRF-Token");
   });
 });
