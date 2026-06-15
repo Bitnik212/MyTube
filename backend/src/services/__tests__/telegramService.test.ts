@@ -17,7 +17,7 @@ import { logger } from "../../utils/logger";
 import * as storageService from "../storageService";
 import { TelegramService } from "../telegramService";
 
-const mockFetch = vi.fn();
+const mockFetch = Object.assign(vi.fn(), { preconnect: vi.fn() });
 global.fetch = mockFetch;
 
 describe("TelegramService", () => {

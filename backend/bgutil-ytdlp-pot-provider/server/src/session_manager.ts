@@ -445,7 +445,7 @@ export class SessionManager {
         intervalMs: number,
     ): FetchFunction {
         const { logger } = this;
-        return async (url: any, options: any): Promise<any> => {
+        const fetchWithRetry = (async (url: any, options: any): Promise<any> => {
             const method = (options?.method || "GET").toUpperCase();
             for (let attempts = 1; attempts <= maxRetries; attempts++) {
                 try {
@@ -478,7 +478,11 @@ export class SessionManager {
                     );
                 }
             }
-        };
+        }) as FetchFunction;
+
+        fetchWithRetry.preconnect = () => {};
+
+        return fetchWithRetry;
     }
 
     async generatePoToken(
