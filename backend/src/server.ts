@@ -23,6 +23,7 @@ import { registerCloudRoutes } from "./server/cloudRoutes";
 import { configureRateLimiting } from "./server/rateLimit";
 import { registerSpaFallback, registerStaticRoutes } from "./server/staticRoutes";
 import { startBackgroundJobs } from "./server/startupJobs";
+import { registerSwaggerRoutes } from "./server/swagger";
 
 VERSION.displayVersion();
 
@@ -76,6 +77,7 @@ const startServer = async (): Promise<void> => {
     registerFeedRoute(app, authLimiters);
     registerStaticRoutes(app, frontendDist);
     registerCloudRoutes(app);
+    registerSwaggerRoutes(app);
     registerApiRoutes(app, authLimiters, { includeFeedRoute: false });
     registerSpaFallback(app, frontendDist);
 

@@ -23,7 +23,7 @@ export type ApiRouteDefinition = {
   path: string;
 };
 
-const apiRouteDefinitions: ApiRouteDefinition[] = [
+export const apiRouteDefinitions: ApiRouteDefinition[] = [
   // Video routes
   {
     method: "get",
